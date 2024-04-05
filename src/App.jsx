@@ -1,7 +1,12 @@
+import { NavLink, Route, Routes } from "react-router-dom";
 import clsx from "clsx";
+import HomePage from "./pages/HomePage/HomePage";
+import MoviesPage from "./pages/MoviesPage/MoviesPage";
+import MovieDetailsPage from "./pages/MovieDetailsPage/MovieDetailsPage";
+import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
+
 import css from "./App.module.css";
 
-import { NavLink } from "react-router-dom";
 
 const getNavLinkClassName = ({ isActive }) => {
   return clsx(css.navLink, isActive && css.active);
@@ -12,17 +17,28 @@ function App() {
     <div>
       <header>
         <nav className={css.nav}>
-          <NavLink className={getNavLinkClassName} to="/Home">
+          <NavLink className={getNavLinkClassName} to="/">
             Home
           </NavLink>
-          <NavLink className={getNavLinkClassName} to="/Movies">
+          <NavLink className={getNavLinkClassName} to="/movies">
             Movies
           </NavLink>
-          <NavLink className={getNavLinkClassName} to="/Searche">
-            Searche
+          <NavLink className={getNavLinkClassName} to="/Details">
+            Details
+          </NavLink>
+          <NavLink className={getNavLinkClassName} to="/NotFound">
+            NotFound
           </NavLink>
         </nav>
       </header>
+      <main>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/movies" element={<MoviesPage />} />
+          <Route path="/movies/:movieId/*" element={<MovieDetailsPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </main>
     </div>
   );
 }
