@@ -1,54 +1,43 @@
 
-import { useParams } from "react-router-dom";
-//import { searchMoviesCreditsById } from "../services/api";
-import { useEffect, useState } from "react";
-import css from "./MovieReviews.module.css";
-import { searchMoviesRevById } from "../services/api";
-import Loader from "../Loader/Loader";
-import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import { useState, useEffect } from 'react';
+import { requestMovieReviews } from '../../services/api';
+import { useParams } from 'react-router-dom';
+import css from './MovieReviews.module.css';
 
-const MovieReviews = () => {
+function MovieReviews() {
   const { movieId } = useParams();
-  const [movieRev, setmovieRev] = useState([]);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    if (!movieId) return;
 
-    const fetchMovieRev = async () => {
+  const [reviews, setReviews] = useState(null);
+
+  useEffect(() => {
+    async function fetchMovieReviews() {
       try {
-        setError(false);
-        setLoading(true);
-        const data = await searchMoviesRevById(movieId);
-        setmovieRev(data.results);
+        const data = await requestMovieReviews(movieId);
+
+        setReviews(data.results);
       } catch (error) {
-        setError(true);
-      } finally {
-        setLoading(false);
+        console.log(error);
       }
-    };
-    fetchMovieRev();
+    }
+    fetchMovieReviews();
   }, [movieId]);
+
   return (
     <>
-      {loading && <Loader />}
-      {error && <ErrorMessage />}
-      <ul className={css.revList}>
-        {movieRev.length > 0 ? (
-          movieRev.map((rev) => {
+      {reviews && (
+        <ul className={css.list}>
+          {reviews.map(review => {
             return (
-              <li key={rev.id} className={css.revItem}>
-                <p className={css.author}>Author: {rev.author}</p>
-                <p>{rev.content}</p>
+              <li key={review.id}>
+                <h3>Author: {review.author}</h3>
+                <p>{review.content}</p>
               </li>
             );
-          })
-        ) : (
-          <p className={css.sorr}>Sorry, no yet review</p>
-        )}
-      </ul>
+          })}
+        </ul>
+      )}
     </>
   );
-};
+}
 
 export default MovieReviews;

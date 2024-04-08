@@ -1,63 +1,47 @@
-import { useParams } from "react-router-dom";
-import { searchMoviesCreditsById } from "../../components/services/api";
-import { useEffect, useState } from "react";
-import css from "./MovieCast.module.css";
-import Loader from "../Loader/Loader";
-import ErrorMessage from "../ErrorMessage/ErrorMessage";
-const MovieCast = () => {
+import { useState, useEffect } from 'react';
+import { requestMovieCast } from '../../services/api';
+import { useParams } from 'react-router-dom';
+import css from './MovieCast.module.css';
+
+function MovieCast() {
   const { movieId } = useParams();
-  const [movieCredits, setmovieCredits] = useState([]);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
+
+  const [movieCast, setMovieCast] = useState(null);
+
   useEffect(() => {
-    if (!movieId) return;
-
-    const fetchMovieCredits = async () => {
+    async function fetchMovieCaste() {
       try {
-        setError(false);
-        setLoading(true);
-        const data = await searchMoviesCreditsById(movieId);
-        setmovieCredits(data.cast);
-      } catch (error) {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMovieCredits();
-  }, [movieId]);
+        const data = await requestMovieCast(movieId);
 
-  const defaultImg =
-    "https://dl-media.viber.com/10/share/2/long/vibes/icon/image/0x0/95e0/5688fdffb84ff8bed4240bcf3ec5ac81ce591d9fa9558a3a968c630eaba195e0.jpg";
+        setMovieCast(data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchMovieCaste();
+  }, [movieId]);
 
   return (
     <>
-      {loading && <Loader />}
-      {error && <ErrorMessage />}{" "}
-      <ul className={css.actors}>
-        {Array.isArray(movieCredits) &&
-          movieCredits.map((credit) => {
+      {movieCast && (
+        <ul className={css.list}>
+          {movieCast.cast.map(actor => {
             return (
-              <li key={credit.id} className={css.movieItem}>
+              <li key={actor.cast_id}>
                 <img
-                  className={css.img}
-                  src={
-                    credit.profile_path !== null
-                      ? `https://image.tmdb.org/t/p/w400${credit.profile_path}`
-                      : defaultImg
-                  }
-                  alt={credit.name}
+                  src={`https://image.tmdb.org/t/p/w500${actor.profile_path}`}
+                  alt={actor.name}
+                  width="100px"
                 />
-                <div className={css.name}>
-                  <p>{credit.name}</p>
-                  <p>Character: {credit.character}</p>
-                </div>
+                <p>{actor.name}</p>
+                <p>Character:{actor.character}</p>
               </li>
             );
           })}
-      </ul>
+        </ul>
+      )}
     </>
   );
-};
+}
 
 export default MovieCast;
